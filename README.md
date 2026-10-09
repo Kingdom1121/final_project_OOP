@@ -9,13 +9,19 @@
 
 ## 1. Giới thiệu đề tài
 
-Đề tài hướng tới việc thiết kế kiến trúc cốt lõi (Core Engine) cho hệ thống bán lẻ sách trực tuyến, tập trung mô phỏng luồng giỏ hàng, thanh toán và khuyến mãi theo chuẩn mô hình lập trình hướng đối tượng.
+Đề tài hướng tới việc thiết kế kiến trúc cốt lõi (Core Engine) cho hệ thống bán lẻ sách trực tuyến (Online Bookstore / E-commerce Platform), tập trung mô phỏng toàn diện quy trình từ quản lý giỏ hàng, áp dụng các chính sách chiết khấu, kiểm soát tồn kho đến tính toán thanh toán đơn hàng.
 
-Mục tiêu trọng tâm của dự án là thể hiện rõ ràng các nguyên lý OOP và mẫu thiết kế:
-1. **Mô hình hóa thực thể:** Xây dựng đầy đủ các lớp `Product`, `OrderItem`, `Cart`, `Order`, `Customer` với trách nhiệm rõ ràng, tránh dồn việc vào một lớp lớn (God class).
-2. **Strategy Pattern cho giảm giá:** Tách rời thuật toán tính chiết khấu ra khỏi luồng xử lý đơn hàng chính thông qua interface `IDiscountStrategy`, đảm bảo tính **Đa hình (Polymorphism)** và nguyên lý **Đóng/Mở (Open/Closed Principle)**.
-3. **Đóng gói & Quản lý tồn kho:** Lớp `Cart` tự đóng gói và bảo vệ dữ liệu bên trong; luồng `CheckoutService` chủ động kiểm tra lượng hàng tồn kho (`Stock`) để ngăn chặn việc đặt hàng vượt mức (Overselling).
+Hệ thống được tổ chức xoay quanh 5 lớp thực thể chính:
+- **`Product`**: Đại diện cho sản phẩm sách/văn phòng phẩm, gồm các thuộc tính `ProductId`, `Name`, `Type`, `Price`, và `Stock` (số lượng hàng tồn kho phục vụ kiểm soát bán hàng).
+- **`OrderItem`**: Đại diện cho một dòng sản phẩm được chọn, gồm thuộc tính `Product`, `Quantity` (số lượng mua) và phương thức `GetTotalPrice()` để tính thành tiền của dòng đó.
+- **`Cart`**: Giỏ hàng của khách hàng, chứa danh sách món hàng `_items`, hỗ trợ các thao tác nghiệp vụ: thêm món (`AddItem`), bớt/xóa món (`RemoveItem`), làm rỗng giỏ (`Clear`) và tính tạm tính (`GetSubTotal`).
+- **`Order`**: Đơn hàng sau khi thanh toán thành công, lưu trữ `OrderId`, `OrderDate`, `Items`, `SubTotal` (tạm tính), `DiscountAmount` (tiền giảm giá), `TaxAmount` (thuế VAT 10%), `FinalTotal` (tổng tiền thanh toán cuối cùng) và phương thức `PrintOrderDetails()`.
+- **`Customer`**: Khách hàng trong hệ thống, gồm `CustomerId`, `Name`, giỏ hàng cá nhân `Cart` và danh sách lịch sử các đơn đã mua `OrderHistory`.
 
+Mục tiêu trọng tâm của dự án là thể hiện rõ nét các nguyên lý OOP và mẫu thiết kế:
+1. **Tính Đóng gói (Encapsulation):** Lớp `Cart` tự đóng gói và bảo vệ danh sách hàng hóa bên trong (sử dụng `private` kết hợp `IReadOnlyCollection`), không để bên ngoài can thiệp trực tiếp vào danh sách.
+2. **Strategy Pattern (Polymorphism & Open/Closed Principle):** Tách biệt thuật toán giảm giá khỏi luồng xử lý đơn hàng chính thông qua interface `IDiscountStrategy` (với các chiến lược `PercentageDiscountStrategy`, `BuyOneGetOneDiscountStrategy`, `NoDiscountStrategy`). Khi bổ sung chính sách khuyến mãi mới, chỉ cần thêm class mới mà không cần chỉnh sửa code của lớp thanh toán.
+3. **Quản lý tồn kho & Kiểm soát nghiệp vụ (Inventory Tracking):** Lớp `CheckoutService` chủ động kiểm tra số lượng tồn kho trước khi thanh toán nhằm ngăn chặn triệt để tình trạng bán quá số lượng hiện có (Overselling), đồng thời tự động áp dụng công thức tính thuế VAT chuẩn và cập nhật lịch sử mua sắm cho khách hàng.
 ---
 
 ## 2. Các nội dung đã chỉnh sửa & tối ưu trong mã nguồn
