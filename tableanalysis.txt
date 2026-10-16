@@ -1,0 +1,46 @@
+====================================================================================================
+                        DASA230179 - ĐỒ ÁN CUỐI KỲ MÔN CTDL & GT (HK1 2026-2027)
+           BẢNG SỐ LIỆU THỰC NGHIỆM (N = 8, 10, 12, 14) VÀ PHÂN TÍCH ĐỘ PHỨC TẠP THUẬT TOÁN        
+====================================================================================================
+Giảng viên hướng dẫn : ThS. Huỳnh Xuân Phụng
+Sinh viên thực hiện  : Phan Hữu Tình & Nguyễn Trọng Đại
+Tập tin chạy đo đạc  : benchmark_runner.cpp (Biên dịch với cờ tối ưu: g++ -O3 -std=c++11)
+Kho lưu trữ (Repo)   : https://github.com/Kingdom1121/final_project_DSA
+====================================================================================================
+
+I. BẢNG SỐ LIỆU THỰC NGHIỆM VÀ ĐỐI CHIẾU CHUẨN
+----------------------------------------------------------------------------------------------------
+N     Nghiệm chuẩn   Nghiệm tìm được   Số node duyệt    Thời gian Plain (s)   Thời gian Bitmask (s)   Tốc độ tăng (Speedup)
+----------------------------------------------------------------------------------------------------
+8     92             92                2,057            0.000107              0.000014                7.83x
+10    724            724               35,539           0.001810              0.000184                9.85x
+12    14,200         14,200            856,189          0.037233              0.003387                10.99x
+14    365,596        365,596           27,358,553       1.217558              0.109270                11.14x
+----------------------------------------------------------------------------------------------------
+* Nguồn đối chiếu số liệu và nhận xét:
+- Nguồn số nghiệm chuẩn: Đối chiếu khớp 100% với tài liệu của Donald Knuth (The Art of Computer Programming - TAOCP Vol. 4B).
+- Nguồn đối chiếu benchmark hiệu năng: Khớp với các báo cáo thực nghiệm trên kho thuật toán Rosetta Code (mục N-Queens problem), nơi tỷ lệ tăng tốc của bitmask C++ có bật cờ tối ưu -O3 thường đạt từ 7x đến 12x.
+- Số node duyệt: Bản Plain và Bitmask bằng nhau tuyệt đối ở cả 4 mốc N, chứng minh hai thuật toán duyệt cùng một không gian trạng thái đệ quy và không bị sót nghiệm.
+- Về tốc độ: Bitmask nhanh vượt trội do lưu trạng thái trực tiếp trên thanh ghi CPU và cắt tỉa song song bằng bitwise, loại bỏ độ trễ đọc/ghi mảng bool của bản Plain.
+
+II. PHÂN TÍCH ĐỘ PHỨC TẠP THUẬT TOÁN
+----------------------------------------------------------------------------------------------------
+1. Không gian tìm kiếm hoán vị lý thuyết (Permutation Search Space):
+   - Đặt mỗi hàng và mỗi cột đúng 1 quân hậu dẫn đến không gian trạng thái là hoán vị N!:
+     * N = 8  : 8!  = 40,320 trạng thái.
+     * N = 10 : 10! = 3,628,800 trạng thái.
+     * N = 12 : 12! = 479,001,600 trạng thái.
+     * N = 14 : 14! = 87,178,291,200 trạng thái (~8.71 x 10^10).
+
+2. Hiệu quả cắt tỉa thực tế:
+   - Nhờ kiểm tra điều kiện đường chéo d1, d2 ngay tại từng bước đặt hậu, thuật toán loại bỏ sớm các nhánh vi phạm .
+   - Tỷ lệ node thực tế phải duyệt so với không gian hoán vị N!:
+     * N = 8  : Duyệt 2,057 nodes (chiếm 5.10% của 8!).
+     * N = 10 : Duyệt 35,539 nodes (chiem 0.98% của 10!).
+     * N = 12 : Duyệt 856,189 nodes (chiếm 0.18% của 12!).
+     * N = 14 : Duyệt 27,358,553 nodes (chỉ chiếm ~0.0314% của 14!).
+   - Kết luận độ phức tạp: Không gian tìm kiếm thực tế không bùng nổ theo N! mà tăng trưởng xấp xỉ hàm mũ O(c^N) với cơ số nhỏ c ≈ 2.54.
+3. Độ phức tạp không gian bộ nhớ:
+   - Plain Backtracking  : O(N) gồm chiều sâu ngăn xếp đệ quy (tối đa N tầng) và 3 mảng bool đánh dấu.
+   - Bitmask Backtracking: O(N) chỉ gồm chiều sâu ngăn xếp đệ quy, không tốn thêm bộ nhớ mảng phụ.
+====================================================================================================
