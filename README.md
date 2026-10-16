@@ -49,3 +49,50 @@ Dựa trên mã nguồn ban đầu và các yêu cầu thiết kế của môn h
 
 - **Định dạng hiển thị Console trong `Program.cs`:**
   * Thêm cấu hình `Console.OutputEncoding = System.Text.Encoding.UTF8;` ở đầu hàm `Main` để in hóa đơn, tên sách và tiếng Việt có dấu rõ ràng, không bị lỗi font trên màn hình console.
+
+    ---
+
+# BÁO CÁO TIẾN ĐỘ TUẦN 2 — CẬP NHẬT & TỐI ƯU
+
+> **Nội dung thực hiện:** Tiếp thu nhận xét GVHD, bổ sung các test case kiểm thử trường hợp biên và tích hợp sơ đồ lớp UML.
+
+## 1. Các nội dung đã chỉnh sửa & bổ sung trong mã nguồn (Tuần 2)
+
+Dựa trên yêu cầu tăng cường kiểm thử và thể hiện tiến độ qua các commit, mã nguồn được mở rộng thêm 3 test case nghiệp vụ chuyên sâu trong `Program.cs` (có đánh dấu chú thích `// [BỔ SUNG TUẦN 2]`):
+
+- **Kiểm thử trường hợp biên — Giỏ hàng rỗng (`Test Case 4`):**
+  * Kịch bản: Khách hàng chưa chọn sản phẩm hoặc đã làm rỗng giỏ (`customer.Cart.Clear()`) nhưng gọi hàm thanh toán `checkoutService.ProcessCheckout(customer, noDiscount)`.
+  * Xử lý: Hệ thống bắt đúng điều kiện `!cartItems.Any()` trong `CheckoutService`, ném ra ngoại lệ `InvalidOperationException` kèm thông báo *"Giỏ hàng đang trống, không thể thanh toán!"* và dừng giao dịch, ngăn việc tạo đơn hàng ảo.
+
+- **Kiểm thử giá trị biên tồn kho — Mua vét kho (`Test Case 5`):**
+  * Kịch bản: Đặt mua chính xác bằng số lượng tồn kho còn lại của sản phẩm (`Quantity = Product.Stock = 5`).
+  * Xử lý: Đơn hàng thanh toán thành công, kiểm tra việc trừ kho tự động đưa số tồn kho còn lại về đúng bằng 0, không bị âm và không bị chặn nhầm.
+
+- **Kiểm thử nghiệp vụ khuyến mãi — BOGO số lượng lẻ (`Test Case 6`):**
+  * Kịch bản: Áp dụng chiến lược `BuyOneGetOneDiscountStrategy` cho khách mua 3 sản phẩm cùng loại (ví dụ mua 3 cây bút giá 20,000 đ/cây).
+  * Xử lý: Kiểm chứng phép chia nguyên `item.Quantity / 2` (3 / 2 = 1 phần tử được miễn phí), số tiền giảm trừ chính xác là 20,000 đ (tổng tiền thanh toán là 2 cây bút + thuế VAT 10%), chứng minh công thức tính chiết khấu hoạt động đúng với cả số chẵn lẫn số lẻ.
+
+---
+
+## 2. Sơ đồ lớp (Class Diagram)
+
+Hệ thống đã hoàn thiện sơ đồ quan hệ đối tượng và mô hình Strategy Pattern:
+
+<img width="1920" height="1080" alt="UML_BOX" src="https://github.com/user-attachments/assets/d9733726-5625-41a6-a148-ad3faed43f4d" />
+
+
+* **Chi tiết kiến trúc trên sơ đồ:**
+  * **Quan hệ cấu thành (Composition/Aggregation):** `Customer` sở hữu `Cart` và danh sách `OrderHistory`; `Cart` và `Order` chứa danh sách các `OrderItem`; mỗi `OrderItem` tham chiếu đến một đối tượng `Product`.
+  * **Strategy Pattern (Tính Đa hình & OCP):** Interface `IDiscountStrategy` được hiện thực bởi 3 lớp cụ thể (`PercentageDiscountStrategy`, `BuyOneGetOneDiscountStrategy`, `NoDiscountStrategy`). Lớp `CheckoutService` chỉ giao tiếp thông qua interface này mà không phụ thuộc vào lớp cụ thể nào.
+
+---
+
+## 3. Tổng kết kết quả chạy kiểm thử (6 Test Cases)
+
+Toàn bộ 6 kịch bản kiểm thử trong `Program.cs` đã được chạy thực nghiệm và đạt kết quả mong đợi:
+1. `Test Case 1 (Happy Path)`: Mua hàng, giảm giá 10%, trừ tồn kho và tính thuế VAT chính xác.
+2. `Test Case 2 (Overselling Validation)`: Chặn thành công đơn hàng mua vượt tồn kho.
+3. `Test Case 3 (Polymorphism Swap)`: Đổi chiến lược sang BOGO số lượng chẵn hoạt động trơn tru.
+4. `Test Case 4 (Empty Cart)`: Chặn thanh toán giỏ hàng trống an toàn.
+5. `Test Case 5 (Boundary Exact Stock)`: Mua vét kho đưa tồn kho về 0 chính xác.
+6. `Test Case 6 (BOGO Odd Quantity)`: Tính đúng tiền giảm giá khi mua số lượng lẻ.
