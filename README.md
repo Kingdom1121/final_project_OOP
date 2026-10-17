@@ -55,6 +55,12 @@ Dựa trên mã nguồn ban đầu và các yêu cầu thiết kế của môn h
 # BÁO CÁO TIẾN ĐỘ TUẦN 2 — CẬP NHẬT & TỐI ƯU
 
 > **Nội dung thực hiện:** Tiếp thu nhận xét GVHD, bổ sung các test case kiểm thử trường hợp biên và tích hợp sơ đồ lớp UML.
+### Bảng phân công nhiệm vụ
+
+| STT | Họ và tên | MSSV | Vai trò | Nhiệm vụ đảm nhiệm |
+| :---: | :--- | :---: | :---: | :--- |
+| 1 | **Nguyễn Trọng Đại** | 25110015 | Nhóm trưởng | - Thiết kế sơ đồ lớp UML (Class Diagram), chuẩn hóa quan hệ giữa các entity và Strategy Pattern.<br>- Review, kiểm tra logic các test case trên file `Program.cs` và quản lý cấu trúc repository. |
+| 2 | **Phan Hữu Tình** | 25110065 | Thành viên | - Cài đặt bổ sung 3 test case mới vào mã nguồn (Giỏ hàng rỗng, Mua vét kho, BOGO số lẻ).<br>- Thực hiện kiểm thử thực nghiệm trên console và commit trực tiếp các thay đổi lên GitHub. |
 
 ## 1. Các nội dung đã chỉnh sửa & bổ sung trong mã nguồn (Tuần 2)
 
