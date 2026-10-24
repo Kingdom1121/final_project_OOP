@@ -102,3 +102,45 @@ Toàn bộ 6 kịch bản kiểm thử trong `Program.cs` đã được chạy t
 4. `Test Case 4 (Empty Cart)`: Chặn thanh toán giỏ hàng trống an toàn.
 5. `Test Case 5 (Boundary Exact Stock)`: Mua vét kho đưa tồn kho về 0 chính xác.
 6. `Test Case 6 (BOGO Odd Quantity)`: Tính đúng tiền giảm giá khi mua số lượng lẻ.
+
+## BÁO CÁO TIẾN ĐỘ TUẦN 3 — HOÀN THIỆN TÍNH NĂNG & KIỂM THỬ HỒI QUY
+
+> **Nội dung thực hiện:** Thực hiện kiểm thử hồi quy 6 test case cũ theo chỉ đạo của GVHD, xây dựng giao diện tương tác Console I/O (chặn vượt tồn kho tức thì, xuất bảng hóa đơn & lịch sử đơn hàng), cập nhật sơ đồ lớp UML và biên soạn tài liệu Tự giải trình kiến trúc (`Explanatory.md`).
+
+### Bảng phân công nhiệm vụ
+
+| STT | Họ và tên | MSSV | Vai trò | Nhiệm vụ đảm nhiệm |
+| :---: | :--- | :---: | :---: | :--- |
+| 1 | **Nguyễn Trọng Đại** | 25110015 | Nhóm trưởng | - Cập nhật và chuẩn hóa sơ đồ lớp UML (`UML_BOX.pdf`), hoàn thiện bảng ký hiệu quan hệ thực thể.<br>- Soạn thảo tài liệu Tự giải trình kiến trúc (`Explanatory.md`) phân tích chi tiết Encapsulation, Polymorphism, Strategy Pattern và OCP. |
+| 2 | **Phan Hữu Tình** | 25110065 | Thành viên | - Mở rộng mã nguồn `Program.cs`: Xây dựng giao diện Console I/O tương tác (Thêm hàng chặn vượt kho tức thì, Xóa/Bớt món, Thanh toán hóa đơn).<br>- Tối ưu và căn chỉnh bố cục hiển thị bảng Hóa đơn & Lịch sử đơn hàng (ASCII Table) chuẩn độ rộng từng ký tự, không bị lệch lề.<br>- Thực hiện kiểm thử hồi quy (Regression Testing) chạy lại 6 test case cũ, đảm bảo không phát sinh lỗi. |
+
+---
+
+### 1. Các nội dung đã chỉnh sửa & bổ sung (Tuần 3)
+
+#### A. Kiểm thử hồi quy tự động (Regression Testing)
+- **Tiếp thu ý kiến GVHD:** Trước khi đưa người dùng vào giao diện mua hàng mới, chương trình tự động chạy lại toàn bộ **6 ca kiểm thử cũ** (Tuần 1 & Tuần 2) để kiểm chứng không phát sinh lỗi hồi quy (No Regression):
+  1. *Test 1 (Happy Path):* Mua sách + bút với chiến lược giảm giá 10%, assert đúng tiền trừ và tồn kho.
+  2. *Test 2 (Overselling):* Bắt ngoại lệ khi cố tình mua vượt quá lượng tồn kho.
+  3. *Test 3 (BOGO):* Kiểm tra tính đa hình của khuyến mãi Mua 1 Tặng 1 (mua 2 tính tiền 1).
+  4. *Test 4 (Empty Cart):* Bắt ngoại lệ `InvalidOperationException` khi thanh toán giỏ hàng rỗng.
+  5. *Test 5 (Boundary Test):* Mua vét sạch kho (tồn kho giảm chính xác về 0).
+  6. *Test 6 (BOGO Odd Quantity):* Mua số lượng lẻ (mua 3 tặng 1 theo công thức `Quantity / 2`).
+
+#### B. Mở rộng giao diện mua hàng tương tác Console I/O (`Program.cs`)
+- **Chức năng 1 — Thêm sản phẩm:** Tích hợp cơ chế kiểm tra tồn kho tức thì (Input Validation). Nếu người dùng nhập số lượng cộng dồn vượt quá lượng hàng có trong kho, hệ thống lập tức từ chối và thông báo lỗi ngay tại màn hình chọn món, không đợi đến lúc checkout.
+- **Chức năng 2 — Bớt / Xóa sản phẩm:** Cho phép bớt số lượng hoặc bỏ hẳn sản phẩm ra khỏi giỏ thông qua phương thức domain `RemoveItem()`.
+- **Chức năng 3 — Thanh toán & Xuất hóa đơn dạng bảng:**
+  - Lựa chọn linh hoạt giữa 3 chiến lược: Giảm giá 15%, Mua 1 Tặng 1 (BOGO) hoặc Không giảm giá.
+  - Thiết kế bảng **HÓA ĐƠN XUẤT RA (ASCII Table)** căn chỉnh cố định đúng 93 ký tự: Hiển thị minh bạch cột Tiền giảm (ghi rõ số tiền kèm số lượng tặng của BOGO, món không đủ điều kiện ghi `0 đ`), đường viền dọc `|` thẳng hàng 100%.
+  - Tự động ghi nhận và in bảng **LỊCH SỬ ĐƠN HÀNG (Order History)** chuẩn 99 ký tự hiển thị đầy đủ: Mã đơn, ngày giờ đặt, số món, tạm tính, giảm giá và tổng thanh toán.
+
+#### C. Bổ sung tài liệu thiết kế & Tự giải trình OOP
+- **Cập nhật sơ đồ UML (`UML_BOX.pdf`):** Chuẩn hóa toàn bộ các mũi tên quan hệ: *Composition* (Order chứa OrderItem), *Aggregation* (Cart chứa OrderItem), *Realization* (các chiến lược hiện thực hóa interface `IDiscountStrategy`) và *Dependency* (CheckoutService phụ thuộc chiến lược lúc gọi hàm).
+- **Soạn thảo tài liệu `Explanatory.md`:** Giải trình chi tiết 4 nguyên lý trọng tâm gắn liền với các class và method cụ thể:
+  1. *Encapsulation:* Bảo vệ toàn vẹn dữ liệu trong `Cart` qua biến `private readonly List<OrderItem> _items` và view chỉ đọc `IReadOnlyCollection`.
+  2. *Polymorphism:* Đa hình động thông qua phương thức `CalculateDiscount(Cart)` của `IDiscountStrategy`.
+  3. *Strategy Pattern:* Tách biệt thuật toán khuyến mãi thành các lớp riêng biệt, hoán đổi linh hoạt tại runtime.
+  4. *Open/Closed Principle (OCP):* Mở rộng thêm loại khuyến mãi mới mà không cần chỉnh sửa mã nguồn cốt lõi trong `CheckoutService`.
+
+---
