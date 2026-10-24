@@ -137,6 +137,8 @@ Toàn bộ 6 kịch bản kiểm thử trong `Program.cs` đã được chạy t
 
 #### C. Bổ sung tài liệu thiết kế & Tự giải trình OOP
 - **Cập nhật sơ đồ UML (`UML_BOX.pdf`):** Chuẩn hóa toàn bộ các mũi tên quan hệ: *Composition* (Order chứa OrderItem), *Aggregation* (Cart chứa OrderItem), *Realization* (các chiến lược hiện thực hóa interface `IDiscountStrategy`) và *Dependency* (CheckoutService phụ thuộc chiến lược lúc gọi hàm).
+- <img width="1396" height="787" alt="image" src="https://github.com/user-attachments/assets/f6e09a76-f0e5-4f27-a0b8-6f22c016efe3" />
+
 - **Soạn thảo tài liệu `Explanatory.md`:** Giải trình chi tiết 4 nguyên lý trọng tâm gắn liền với các class và method cụ thể:
   1. *Encapsulation:* Bảo vệ toàn vẹn dữ liệu trong `Cart` qua biến `private readonly List<OrderItem> _items` và view chỉ đọc `IReadOnlyCollection`.
   2. *Polymorphism:* Đa hình động thông qua phương thức `CalculateDiscount(Cart)` của `IDiscountStrategy`.
