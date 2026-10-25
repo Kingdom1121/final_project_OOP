@@ -139,10 +139,10 @@ Toàn bộ 6 kịch bản kiểm thử trong `Program.cs` đã được chạy t
 - **Cập nhật sơ đồ UML (`UML_BOX.pdf`):** Chuẩn hóa toàn bộ các mũi tên quan hệ: *Composition* (Order chứa OrderItem), *Aggregation* (Cart chứa OrderItem), *Realization* (các chiến lược hiện thực hóa interface `IDiscountStrategy`) và *Dependency* (CheckoutService phụ thuộc chiến lược lúc gọi hàm).
   <img width="1396" height="787" alt="image" src="https://github.com/user-attachments/assets/f6e09a76-f0e5-4f27-a0b8-6f22c016efe3" />
 
-- **Soạn thảo tài liệu `Explanatory.md`:** Giải trình chi tiết 4 nguyên lý trọng tâm gắn liền với các class và method cụ thể:
-  1. *Encapsulation:* Bảo vệ toàn vẹn dữ liệu trong `Cart` qua biến `private readonly List<OrderItem> _items` và view chỉ đọc `IReadOnlyCollection`.
-  2. *Polymorphism:* Đa hình động thông qua phương thức `CalculateDiscount(Cart)` của `IDiscountStrategy`.
-  3. *Strategy Pattern:* Tách biệt thuật toán khuyến mãi thành các lớp riêng biệt, hoán đổi linh hoạt tại runtime.
-  4. *Open/Closed Principle (OCP):* Mở rộng thêm loại khuyến mãi mới mà không cần chỉnh sửa mã nguồn cốt lõi trong `CheckoutService`.
+* **Tự biên soạn tài liệu `Explanatory.md`:** Giải trình chuyên sâu cấu trúc hệ thống, cơ chế quản lý bộ nhớ và các nguyên lý OOP phục vụ vấn đáp bảo vệ:
+  1. *Kiến trúc Domain Models & Bộ nhớ:* Phân tích cơ chế theo dõi tồn kho theo tham chiếu trong `Product`; áp dụng Composition trong `OrderItem` tránh lãng phí RAM; kỹ thuật **Deep Copy** trong constructor `Order` bằng LINQ để bảo toàn lịch sử giao dịch khi giỏ hàng bị dọn sạch (`Cart.Clear()`).
+  2. *Encapsulation:* Đóng gói giỏ hàng `Cart` qua biến `private readonly List<OrderItem> _items` và view chỉ đọc `IReadOnlyCollection`, kiểm soát chặt chẽ việc tăng số lượng và tự hủy món khi về 0.
+  3. *Polymorphism & Strategy Pattern:* Tách thuật toán khuyến mãi khỏi quy trình thanh toán, áp dụng Dynamic Dispatch lúc runtime; tuân thủ nguyên lý Đơn trách nhiệm (SRP) và Đóng/Mở (OCP).
+  4. *Kiểm soát luồng nghiệp vụ (CheckoutService):* Áp dụng nguyên lý **Fail-Fast** chặn giỏ rỗng và mua vượt tồn kho ngay từ đầu; thiết lập chốt chặn an toàn tài chính (không cho chiết khấu vượt quá tạm tính).
 
 ---
