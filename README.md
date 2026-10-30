@@ -146,3 +146,97 @@ Toàn bộ 6 kịch bản kiểm thử trong `Program.cs` đã được chạy t
   4. *Kiểm soát luồng nghiệp vụ (CheckoutService):* Áp dụng nguyên lý **Fail-Fast** chặn giỏ rỗng và mua vượt tồn kho ngay từ đầu; thiết lập chốt chặn an toàn tài chính (không cho chiết khấu vượt quá tạm tính).
 
 ---
+
+# BÁO CÁO TIẾN ĐỘ TUẦN 4 — TỔNG HỢP TIẾN ĐỘ & SẴN SÀNG BẢO VỆ ĐỒ ÁN
+
+> **Nội dung thực hiện:** Tổng hợp toàn diện tiến độ triển khai qua 3 tuần (Kiến trúc hệ thống, Kiểm thử hồi quy, Giao diện Console I/O, Tài liệu thiết kế UML và Tự giải trình Explanatory.md), hoàn thiện kho lưu trữ mã nguồn và chuẩn bị kịch bản demo/vấn đáp bảo vệ đồ án cuối kỳ.
+
+---
+
+## 1. Thông tin chung & Bảng phân công nhiệm vụ
+
+- **Học phần:** Lập trình Hướng đối tượng (Object-Oriented Programming)
+- **Mã lớp học phần:** OOP230179_Dot1 — HK1 2026-2027
+- **Giảng viên hướng dẫn (GVHD):** ThS. Huỳnh Xuân Phụng
+- **Đề tài:** Online Bookstore / E-commerce Platform
+- **Kho lưu trữ (Repository):** [Kingdom1121/OOP_OnlineBookstore_Final_Project](https://github.com/Kingdom1121/OOP_OnlineBookstore_Final_Project)
+
+### Bảng phân công nhiệm vụ
+
+| STT | Họ và tên | MSSV | Vai trò | Nhiệm vụ đảm nhiệm |
+| :---: | :--- | :---: | :---: | :--- |
+| 1 | **Nguyễn Trọng Đại** | 25110015 | Nhóm trưởng | - Tổng hợp tiến độ triển khai qua các tuần, rà soát tính nhất quán giữa tài liệu Explanatory.md và mã nguồn.<br>- Chuẩn bị nội dung vấn đáp bảo vệ lý thuyết OOP, phân tích cơ chế bộ nhớ và Design Pattern. |
+| 2 | **Phan Hữu Tình** | 25110065 | Thành viên | - Đồng bộ, kiểm tra và hoàn thiện tài liệu báo cáo tuần 4 trên file README.md.<br>- Xây dựng kịch bản demo chạy thực nghiệm toàn bộ luồng Console I/O và kiểm thử hồi quy 6 test case trên source code để sẵn sàng vấn đáp trước GVHD. |
+---
+
+## 2. Tổng hợp tiến độ triển khai qua các tuần (Tuần 1 — Tuần 3)
+
+### Tuần 1: Xây dựng Core Engine & Tối ưu hóa nguyên lý OOP
+- **Kiến trúc miền cốt lõi (Domain Models):**
+  - Xây dựng 5 class nền tảng: `Product`, `OrderItem`, `Cart`, `Order`, `Customer`.
+  - Quản lý giỏ hàng và danh sách lịch sử đơn hàng an toàn.
+- **Tối ưu hóa mã nguồn & sửa lỗi logic:**
+  - Chuẩn hóa công thức chiết khấu, tiền chịu thuế và thuế VAT 10% tại `CheckoutService`.
+  - Thêm điều kiện chặn an toàn tài chính: `discountAmount <= subTotal`, chống lỗi đơn hàng bị âm tiền.
+  - Tối ưu tính **Đóng gói (Encapsulation)** cho `Cart`: sử dụng `private readonly List<OrderItem> _items` và chỉ công khai qua `IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly()`. Mọi thao tác thêm/xóa/sửa bắt buộc thông qua `AddItem()`, `RemoveItem()`, `Clear()`.
+  - Xử lý chống bán vượt kho (**Overselling**) theo nguyên lý **Fail-Fast**: kiểm tra toàn bộ tồn kho trước, nếu hợp lệ mới tiến hành trừ tồn kho thực tế.
+  - Hỗ trợ hiển thị tiếng Việt trên màn hình dòng lệnh với `Console.OutputEncoding = Encoding.UTF8`.
+
+### Tuần 2: Mở rộng kiểm thử trường hợp biên & Tích hợp sơ đồ UML
+- **Bổ sung 3 test case nghiệp vụ chuyên sâu vào `Program.cs`:**
+  - *Test Case 4 (Empty Cart):* Bắt ngoại lệ `InvalidOperationException` khi cố tình thanh toán giỏ hàng rỗng.
+  - *Test Case 5 (Boundary Test):* Mua vét sạch kho (`Quantity = Stock`), kiểm tra tồn kho giảm chính xác về đúng bằng `0`.
+  - *Test Case 6 (BOGO Odd Quantity):* Mua số lượng lẻ (mua 3 tặng 1 qua phép chia nguyên `Quantity / 2`), đảm bảo công thức chiết khấu chính xác với cả số chẵn lẫn số lẻ.
+- **Thiết kế sơ đồ lớp UML (Class Diagram):**
+  - Chuẩn hóa các mối quan hệ thực thể: Composition (Order - OrderItem), Aggregation (Cart - OrderItem), Realization (`IDiscountStrategy` với 3 chiến lược: `Percentage`, `BOGO`, `NoDiscount`), và Dependency (`CheckoutService`).
+
+### Tuần 3: Kiểm thử hồi quy tự động, Console I/O & Tự giải trình kiến trúc
+- **Kiểm thử hồi quy tự động (Regression Testing):**
+  - Thực hiện đúng yêu cầu của GVHD: Tự động chạy lại toàn bộ **6/6 ca kiểm thử cũ** trước khi khởi động giao diện người dùng, đảm bảo 100% không phát sinh lỗi hồi quy (*No Regression Detected*).
+- **Phát triển giao diện tương tác Console I/O (`Program.cs`):**
+  - *Thêm sản phẩm:* Kiểm tra tồn kho tức thì tại bước nhập liệu (`Input Validation`), lập tức từ chối và cảnh báo nếu số lượng cộng dồn vượt kho hiện tại.
+  - *Bớt / Xóa sản phẩm:* Cho phép giảm số lượng hoặc loại bỏ sản phẩm khỏi giỏ qua phương thức `RemoveItem()`.
+  - *Thanh toán & Xuất bảng ASCII:* Lựa chọn linh hoạt giữa 3 chiến lược khuyến mãi; xuất bảng Hóa đơn (chuẩn 93 ký tự) và Lịch sử đơn hàng (chuẩn 99 ký tự) ngay ngắn, thẳng hàng 100% cả với tiếng Việt có dấu UTF-8 và số tiền hàng triệu đồng.
+- **Hoàn thiện hồ sơ thiết kế & Tự giải trình OOP:**
+  - Cập nhật tài liệu `UML_BOX.pdf` hoàn thiện toàn bộ ký hiệu quan hệ thực thể.
+  - Biên soạn tài liệu `Explanatory.md` phân tích chuyên sâu 4 khía cạnh:
+    1. *Mô hình bộ nhớ & Domain Models:* Quản lý tồn kho theo tham chiếu trong `Product`; cơ chế Composition trong `OrderItem`; kỹ thuật **Deep Copy** bằng LINQ trong constructor của `Order` để đóng băng lịch sử giao dịch khi giỏ hàng bị xóa (`Cart.Clear()`).
+    2. *Encapsulation:* Bảo vệ toàn vẹn dữ liệu trong `Cart`, tự hủy phần tử khi số lượng về 0.
+    3. *Polymorphism & Strategy Pattern:* Áp dụng Dynamic Dispatch lúc runtime, tuân thủ nguyên lý Đơn trách nhiệm (SRP) và Đóng/Mở (OCP).
+    4. *Kiểm soát luồng nghiệp vụ:* Triển khai Fail-Fast và chốt chặn an toàn tài chính tại `CheckoutService`.
+
+---
+
+## 3. Tổng kết kết quả kiểm thử hệ thống (6 Test Cases)
+
+| Kịch bản kiểm thử | Mô tả nghiệp vụ | Kết quả thực tế |
+| :--- | :--- | :---: |
+| **Test Case 1 (Happy Path)** | Mua sách + bút, áp dụng giảm giá 10%, tính thuế VAT 10% | **PASSED** |
+| **Test Case 2 (Overselling)** | Cố tình đặt mua vượt quá tồn kho thực tế, kích hoạt Fail-Fast | **PASSED** |
+| **Test Case 3 (Polymorphism BOGO)**| Hoán đổi chiến lược sang Buy One Get One (mua 2 tặng 1) | **PASSED** |
+| **Test Case 4 (Empty Cart)** | Thanh toán khi giỏ hàng rỗng, ném `InvalidOperationException` | **PASSED** |
+| **Test Case 5 (Boundary Test)** | Mua vét sạch kho (`Quantity = Stock`), đưa tồn kho về đúng 0 | **PASSED** |
+| **Test Case 6 (BOGO Odd Quantity)**| Mua số lượng lẻ (mua 3 tặng 1), áp dụng đúng chia nguyên | **PASSED** |
+
+---
+
+## 4. Danh mục tài liệu & Minh chứng trên GitHub
+
+- **Mã nguồn ứng dụng & Test cases:** [`OOP_CK/OnlineBookstore/Program.cs`](https://github.com/Kingdom1121/OOP_OnlineBookstore_Final_Project/blob/main/OOP_CK/OnlineBookstore/Program.cs)
+- **Tài liệu tự giải trình kiến trúc:** [`Explanatory.md`](https://github.com/Kingdom1121/OOP_OnlineBookstore_Final_Project/blob/main/Explanatory.md)
+- **Sơ đồ lớp chuẩn hóa:** [`UML_BOX.pdf`](https://github.com/Kingdom1121/OOP_OnlineBookstore_Final_Project/blob/main/UML_BOX.pdf)
+- **Các commit minh chứng quan trọng:**
+  - `20be97f`: Chuẩn hóa sơ đồ lớp UML và mô hình Strategy Pattern.
+  - `2e046c6`: Xây dựng giao diện Console I/O, chặn vượt tồn kho tức thì và kiểm thử hồi quy 6 test case.
+
+---
+
+## 5. Kế hoạch Tuần 4 (Chuẩn bị bảo vệ đồ án - Oral/Live Defense)
+
+1. Rà soát, đồng bộ và khóa toàn bộ mã nguồn, tài liệu thiết kế trên GitHub repository.
+2. Chuẩn bị kịch bản demo chạy thực nghiệm toàn diện trên Console:
+   - Chạy tự động luồng kiểm thử hồi quy 6 test case.
+   - Thao tác trực tiếp các luồng biên: kiểm tra chặn mua quá kho tức thì, bớt món, xuất hóa đơn và kiểm tra bảng lịch sử giao dịch.
+3. Luyện tập vấn đáp phản biện trực tiếp (Q&A): giải trình chi tiết về kiến trúc mã nguồn, cơ chế Deep Copy/tham chiếu đối tượng và các nguyên lý OOP (Encapsulation, Polymorphism, Strategy Pattern, OCP, Fail-Fast) trước GVHD.
+
+
